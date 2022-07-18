@@ -1,287 +1,175 @@
-//console.log('Test'); 1)testing connection
+const nameField = document.querySelector('#name');
+const jobTitle = document.querySelector('#title');
+const otherJob = document.querySelector('#other-job-role');
+const shirtDesign = document.querySelector('#design');
+const shirtColor = document.querySelector('#color');
+const activities = document.querySelector('#activities');
+const activitiesCost = document.querySelector('#activities-cost');
+const payment = document.querySelector('#payment');
+const creditCard = document.querySelector('#credit-card');
+const paypal = document.querySelector('#paypal');
+const bitcoin = document.querySelector('#bitcoin');
+const form = document.getElementsByTagName('form')[0];
+const email = document.querySelector('#email');
+const cardNum = document.querySelector('#cc-num');
+const zipCode = document.querySelector('#zip');
+const cvv = document.querySelector('#cvv');
+const checkboxes = activities.querySelectorAll('[type="checkbox"]');
 
-`use strict`
-const form = document.querySelector(`form`);
-const nameElement = document.querySelector(`#name`);
-const emailElement = document.querySelector(`#email`);
-const titleSelectElement = document.querySelector(`#title`);
-const titleOptionElements = document.querySelectorAll(`#title option`);
-const otherJobElement = document.querySelector(`#other-job-role`);
-const designElement = document.querySelector(`#design`);
-const colorElement = document.querySelector(`#color`);
-const colorElements = document.querySelector(`#color`).children;
-const activitiesElement = document.querySelector('#activities');
-const activitiesElements = document.querySelectorAll('#activities input');
-const activitiesBoxElement = document.querySelector('#activities-box');
-const activitiesCostElement = document.querySelector('#activities-cost');
-const paymentElement = document.querySelector('#payment');
-const creditCardElement = document.querySelector('#credit-card');
-const ccNumElement = document.querySelector('#cc-num');
-const zipElement = document.querySelector('#zip');
-const cvvElement = document.querySelector('#cvv');
-const paypalElement = document.querySelector('#paypal');
-const bitcoinElement = document.querySelector('#bitcoin');
+nameField.focus();
+//Hides the Other Job field, until that option is selected
+//from the Job Field dropdown menu
+otherJob.style.display = 'none';
 
-otherJobElement.style.display = `none`;
-// when the page first loads, the first text field should have the focus state 
-nameElement.focus();
-// set total to zero, start counting from zero
-let totalCost = 0;
-let totalActivitiesChecked = 0;
-// Disable "Color" selector by default
-colorElement.disabled = true;
-// by default Hide the PayPal and BitCoin text 
-paypalElement.style.display = `none`;
-bitcoinElement.style.display = `none`;
-// Sets the deafult selection to Credit Card
-paymentElement.value = `credit-card`;
-// validation
-const nameRegEx = new RegExp(/^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/);
-const emailRegEx = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, `i`);
-const ccNumRegEx = new RegExp(/^\d{13,16}$/);
-const zipRegEx = new RegExp(/^\d{5}$/);
-const cvvRegEx = new RegExp(/^\d{3}$/);
-// Toggle job role
-titleSelectElement.addEventListener(`change`, e => {
-    for ( let i = 0; i < titleOptionElements.length; i++ ) {
-        const titleValue = e.target.value;
-        if ( titleValue === `other` ) {
-            otherJobElement.style.display = `block`;
-            otherJobElement.focus();
-        } else {            
-            otherJobElement.style.display = `none`;
-        }
-    }
-});
-designElement.addEventListener(`change`, e => {
-    // Enable "Color" dropdown on any "Design" field selection
-    colorElement.disabled = false;
-    
-    for ( let i = 0; i < colorElements.length; i++ ) {
-        const designValue = e.target.value;
-        let colorOption = colorElements[i].getAttribute(`data-theme`);
-        
-        // Compares the design selection with the options and
-        // display corresponding shirt types
-        if ( designValue === colorOption ) {
-            colorElements[i].hidden = false;
-            colorElements[i].setAttribute(`selected`, ``);
-        } else {        
-            colorElements[i].hidden = true;
-            colorElements[i].removeAttribute(`selected`);
-        }
-    }
-});
-// Listener to calculate total cost and count number of checkbox for validation
-activitiesElement.addEventListener('change', e => {
-    const activityCheck = e.target;
-    const activityValue = parseInt(activityCheck.getAttribute(`data-cost`));
-    const activityTime = activityCheck.getAttribute(`data-day-and-time`);
-    if ( activityCheck.checked ) {
-        totalCost += activityValue;
-        totalActivitiesChecked++;
-    } else {        
-        totalCost -= activityValue;
-        totalActivitiesChecked--;
-    }
-    activitiesCostElement.innerHTML = `Total: $${totalCost}`;
-    
-    // disable the duplicate time event
-    for ( let i = 0; i < activitiesElements.length; i++) {
-        if ( activitiesElements[i] !== activityCheck && activitiesElements[i].getAttribute(`data-day-and-time`) === activityTime ) {
-            if( activityCheck.checked === true ) {
-                activitiesElements[i].parentElement.classList.add(`disabled`);
-                activitiesElements[i].disabled = true;
-            } else {       
-                activitiesElements[i].parentElement.classList.remove(`disabled`);
-                activitiesElements[i].disabled = false;
-            }
-        }
-    }
-});
-// Set focus styling on Activities when focused
-// Code from from Checkboxes warm ups
-activitiesElements.forEach( element => {
-    element.addEventListener('focus', e => element.parentElement.classList.add('focus'));
-    element.addEventListener('blur', e => {
-        const active = document.querySelector('.focus');
-        if (active) active.classList.remove('focus');
-    })
-});
-// Display payment message
-paymentElement.addEventListener('change', e => {
-    creditCardElement.style.display = `none`;
-    const paymentValue = e.target.value;
-    if ( paymentValue === `paypal` ) {
-        paypalElement.style.display = `block`;
-        bitcoinElement.style.display = `none`;
-    } else if ( paymentValue === `bitcoin` ) {
-        paypalElement.style.display = `none`;
-        bitcoinElement.style.display = `block`;
-    } else {        
-        creditCardElement.style.display = `block`;
-        paypalElement.style.display = `none`;
-        bitcoinElement.style.display = `none`;
-    }
-});
-/**
- * Function expression to set passed validation styling
- * for element with valid entry and hide error messaging
- *
- * @param {HTML element} element - Selected element
- */  
-const validationPass = element => {
-    element.parentElement.classList.add(`valid`);
-    element.parentElement.classList.remove(`not-valid`);
-    element.parentElement.lastElementChild.style.display = `none`;
-}
-/**
- * Function expression to set failed validation styling
- * for element with invalid entry and show error messaging
- * Update: Added additional messaging based on blank 
- * field value
- *
- * @param {HTML element} element - Selected element
- */   
-const validationFail = element => {
-    element.parentElement.classList.add(`not-valid`);
-    element.parentElement.classList.remove(`valid`);
-    element.parentElement.lastElementChild.style.display = `block`;
-    if ( element === emailElement && emailElement.value === `` ) {
-        element.nextElementSibling.innerHTML = `Email address cannot be blank`;
-    } else if ( element === emailElement && emailElement.value !== `` ) {
-        element.nextElementSibling.innerHTML = `Email address must be formatted correctly`;
-    } else if ( element === ccNumElement && ccNumElement.value === `` ) {
-        element.nextElementSibling.innerHTML = `Credit card number cannot be blank`;
-    } else if ( element === ccNumElement && ccNumElement.value !== `` ) {
-        element.nextElementSibling.innerHTML = `Credit card number must be between 13 - 16 digits`;
-    } else if ( element === zipElement && zipElement.value === `` ) {
-        element.nextElementSibling.innerHTML = `Zip Code cannot be blank`;
-    } else if ( element === zipElement && zipElement.value !== `` ) {
-        element.nextElementSibling.innerHTML = `Zip Code must be 5 digits`;
-    } else if ( element === cvvElement && cvvElement.value === `` ) {
-        element.nextElementSibling.innerHTML = `CVV cannot be blank`;
-    } else if ( element === cvvElement && cvvElement.value !== `` ) {
-        element.nextElementSibling.innerHTML = `CVV must be 3 digits`;
-    }
-}
-/**
- * Function expression to set failed validation styling
- * for element with invalid entry
- *
- * @param {HTML element} elementName - Selected element
- * @param {RegEx} regExPattern - RegEx pattern used for test
- */  
-const elementValidator = (elementName, regExPattern) => {
-    const isValid = regExPattern.test(elementName.value); 
-    if ( isValid ) {
-      validationPass(elementName);
+//Makes Credit card appear as the first payment option
+//while hidding paypal and bitcoin
+payment.children[1].setAttribute('selected','');
+paypal.setAttribute('hidden', '');
+bitcoin.setAttribute('hidden', '');
+//Disables the shirtcolor menu
+shirtColor.disabled = true;
+
+jobTitle.addEventListener('change', e => {
+    if(jobTitle.options[6].selected){
+        otherJob.style.display = '';
     } else {
-      validationFail(elementName);
+        otherJob.style.display = 'none';
     }
-    return isValid;
+})
+
+shirtDesign.addEventListener('change', e => {
+
+    shirtColor.disabled = false;
+
+    for(let i = 0; i < shirtColor.length; i++){
+
+        if(e.target.value !== shirtColor.children[i].getAttribute('data-theme')){
+            shirtColor.selectedIndex = '-1';
+            shirtColor.children[i].style.display = 'none';
+        } else {
+            shirtColor.children[i].style.display = 'initial'
+        } 
+    }
+});
+
+//Counter of all selected events
+let totalCost= 0;
+
+activities.addEventListener('change', e => {
+    let clicked = e.target
+
+    let eventCost = parseInt(clicked.getAttribute('data-cost'));
+    //Ternary operator that adds /substracts checked/unchecked events
+    totalCost = clicked.checked ? totalCost + eventCost
+                                :  totalCost - eventCost;
+    activitiesCost.innerHTML= `Total $${totalCost}`;
+
+    // let addedToCalendar = clicked. checked.getAttribute('data-day-and-time');
+    // for(let i = 0; i < checkboxes.length; i++ ){
+    //     if()
+    // }
+
+});
+
+activities.addEventListener('focusin', e => {
+
+    let target = e.target;
+    for(let i=0; i< checkboxes.length; i++){
+        if(target == checkboxes[i]){
+            checkboxes[i].parentNode.classList.add('focus');                  
+        } else{
+            checkboxes[i].parentNode.classList.remove('focus'); 
+        }
+    }  
+})
+
+payment.addEventListener('change', e => {
+    let option = e.target.value;
+    let paymentOptions = [creditCard, paypal, bitcoin];
+    
+    for(let i = 0; i< paymentOptions.length; i++){   
+        if(option === paymentOptions[i].id ){
+            paymentOptions[i].hidden = false;
+        }else {
+            paymentOptions[i].hidden = true;
+        }
+    } 
+});
+
+// Helper functions to Show or Hide Hints
+function showHint(element){
+
+    element.parentElement.classList.add('not-valid');
+    element.parentElement.classList.remove('valid');
+    element.parentElement.lastElementChild.style.display = 'inline-block';
 }
-/**
- * Function expression to determine at least one 
- * activity has been selected
- *
- */  
+
+function hideHint(element){
+    element.parentElement.classList.add('valid');
+    element.parentElement.classList.remove('not-valid');
+    element.parentElement.lastElementChild.style.display = 'none';
+}  
+
+//Individual validator function with accesibility feature to show or hide hints
+const nameValidator = () =>{
+    const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*?  ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(nameField.value);
+
+    nameIsValid ? hideHint(nameField) : showHint(nameField);
+
+    return nameIsValid;
+}
+
+const emailValidator = () => {
+    const emailIsValid  = /^[^@]+@[^@]+\.[a-z]+$/i.test(email.value);
+
+    emailIsValid ? hideHint(email) : showHint(email);
+
+    return emailIsValid;
+}
+
 const activitiesValidator = () => {
-    const totalActivitiesIsValid = totalActivitiesChecked > 0;
-    if ( totalActivitiesIsValid ) {
-        validationPass(activitiesBoxElement);
-    } else {
-        validationFail(activitiesBoxElement);
-    }
-    return totalActivitiesIsValid;
+    let activityBox = document.getElementById('activities-box');
+    let activitiesIsValid = false;
+    if(totalCost > 0){
+        activitiesIsValid = true
+    } 
+    activitiesIsValid ? hideHint(activityBox) : showHint(activityBox);
+    return activitiesIsValid;
 }
-form.addEventListener('submit', e => {
-    if (!elementValidator(nameElement, nameRegEx)) {
-      console.log('Invalid name prevented submission');
-      e.preventDefault();
-    }
-  
-    if (!elementValidator(emailElement, emailRegEx)) {
-      console.log('Invalid email prevented submission');
-      e.preventDefault();
-    }
-  
-    if (!activitiesValidator()) {
-      console.log('Invalid number of activities selected prevented submission');
-      e.preventDefault();
-    }
-  
-    if (!elementValidator(ccNumElement, ccNumRegEx)) {
-      console.log('Invalid credit card number prevented submission');
-      e.preventDefault();
-    }
-  
-    if (!elementValidator(zipElement, zipRegEx)) {
-      console.log('Invalid zip code prevented submission');
-      e.preventDefault();
-    }
-  
-    if (!elementValidator(cvvElement, cvvRegEx)) {
-      console.log('Invalid cvv number prevented submission');
-      e.preventDefault();
-    }
-});
+const creditCardValidator = () => {
+    const cardNumIsValid = /\d{13,16}/.test(cardNum.value);
+    const zipCodeIsValid = /\d{5}/.test(zipCode.value)
+    const cvvIsValid = /\d{3}/.test(cvv.value);
 
-// Utilize focusout event listener to find out of focused  
-// input field and display appropiate error message
-// input field and display appropriate error message
-form.addEventListener('focusout', e => {
-    // Switch statement to trigger corresponding error message
-    switch (e.target) {
-        case nameElement:            
-            if (!elementValidator(nameElement, nameRegEx)) {
-                console.log('Invalid name prevented submission');
-                e.preventDefault();
-            }
-            break;
-        
-        case emailElement:
-            if (!elementValidator(emailElement, emailRegEx)) {
-            console.log('Invalid email prevented submission');
+    cardNumIsValid ? hideHint(cardNum) : showHint(cardNum);
+    zipCodeIsValid ? hideHint(zipCode) : showHint(zipCode);
+    cvvIsValid     ? hideHint(cvv)     : showHint(cvv);
+
+    if( cardNumIsValid && zipCodeIsValid && cvvIsValid ){
+        return console.log(`credit card pass`);
+    } else {
+        return console.log(`credit card validation fail`);
+    }}
+
+    form.addEventListener('submit', e => {
+        if(!nameValidator()) {  
             e.preventDefault();
-            }
-            break;
-        case activitiesBoxElement.lastElementChild.firstElementChild:  
-            if (!activitiesValidator() && e.target.getAttribute(`name`) === `express` ) {
-                console.log('Invalid number of activities selected prevented submission');
-                e.preventDefault();
-            }
-            break;
-        case ccNumElement:
-            if (!elementValidator(ccNumElement, ccNumRegEx)) {
-                console.log('Invalid credit card number prevented submission');
-                e.preventDefault();
-            }
-            break;        
-        
-        case zipElement:
-            if (!elementValidator(zipElement, zipRegEx)) {
-            console.log('Invalid zip code prevented submission');
-            e.preventDefault();
-            }
-            break;
-        
-        case cvvElement:
-            if (!elementValidator(cvvElement, cvvRegEx)) {
-            console.log('Invalid cvv number prevented submission');
-            e.preventDefault();
-            }
-            break;
-    }
-});
-// Second focusout event listener to find any updates made  
-// in the checkbox fields and display appropriate error message
-activitiesBoxElement.addEventListener('focusout', e => {
-    const checkBoxGroup = e.target.parentElement.parentElement;
-    if ( (totalActivitiesChecked < 0 && checkBoxGroup !== activitiesBoxElement) || (totalActivitiesChecked > 0 && checkBoxGroup === activitiesBoxElement) ) {
-        if (!activitiesValidator()) {
-            console.log('Invalid number of activities selected prevented submission');
-            e.preventDefault();
+            console.log(`Name validator prevented submission`);
         }
-    }    
-});
+    
+        if(!emailValidator()) {
+            e.preventDefault();
+            console.log(`Email Validator prevented submission`);
+        }
+    
+         if(!activitiesValidator()) {
+             e.preventDefault();
+             console.log('Activities validator prevented submission');
+            }
+            if(payment.options[1].value){
+                if(!creditCardValidator()){
+                    e.preventDefault();
+                }
+            }
+        
+        });
