@@ -16,11 +16,11 @@ const zipCode = document.querySelector('#zip');
 const cvv = document.querySelector('#cvv');
 const checkboxes = activities.querySelectorAll('[type="checkbox"]');
 
+
 nameField.focus();
 //Hides the Other Job field, until that option is selected
 //from the Job Field dropdown menu
 otherJob.style.display = 'none';
-
 //Makes Credit card appear as the first payment option
 //while hidding paypal and bitcoin
 payment.children[1].setAttribute('selected','');
@@ -37,42 +37,54 @@ jobTitle.addEventListener('change', e => {
     }
 })
 
-shirtDesign.addEventListener('change', e => {
-
+jshirtDesign.addEventListener('change', e => {
+    /**
+     * Event reporting that the user made a selection on the
+     * Design dropdown menu, thus can pick and option from the
+     * filtered color menu (Shirtcolor.lenght);
+     */    
     shirtColor.disabled = false;
-
+ 
+  
     for(let i = 0; i < shirtColor.length; i++){
-
         if(e.target.value !== shirtColor.children[i].getAttribute('data-theme')){
-            shirtColor.selectedIndex = '-1';
-            shirtColor.children[i].style.display = 'none';
+            // shirtColor.children[0].textContent = `Pick a Color`;
+            // shirtColor.selectedIndex = '-1';
+            shirtColor.children[i].hidden = true;
+            shirtColor.children[i].removeAttribute('selected');
+           
         } else {
-            shirtColor.children[i].style.display = 'initial'
+            shirtColor.children[i].hidden = false;
+            shirtColor.children[i].setAttribute('selected', true);
         } 
     }
 });
+console.log(checkboxes[1].getAttribute('data-day-and-time'));
 
-//Counter of all selected events
+/Counter of all selected events
 let totalCost= 0;
-
 activities.addEventListener('change', e => {
     let clicked = e.target
-
     let eventCost = parseInt(clicked.getAttribute('data-cost'));
     //Ternary operator that adds /substracts checked/unchecked events
     totalCost = clicked.checked ? totalCost + eventCost
                                 :  totalCost - eventCost;
     activitiesCost.innerHTML= `Total $${totalCost}`;
-
-    // let addedToCalendar = clicked. checked.getAttribute('data-day-and-time');
-    // for(let i = 0; i < checkboxes.length; i++ ){
-    //     if()
+    
+    // for(let i = 0; i< checkboxes.length; i++){
+    //     if(clicked.getAttribute('data-day-and-time') && )
     // }
-
+      
 });
-
+//Activities accesibility listener
 activities.addEventListener('focusin', e => {
-
+    /**
+     * This event listener uses focusin instead of focus, because
+     * the it bubbles, which is nedded since the event listene is usend activities which is the parentNode of all the checkboxes
+     * 
+     * Use tab to go DOWN the activities list and space bar to check which to attend
+     * Use tab + shift go UP the list
+     */
     let target = e.target;
     for(let i=0; i< checkboxes.length; i++){
         if(target == checkboxes[i]){
@@ -95,81 +107,70 @@ payment.addEventListener('change', e => {
         }
     } 
 });
-
 // Helper functions to Show or Hide Hints
 function showHint(element){
-
+   
     element.parentElement.classList.add('not-valid');
     element.parentElement.classList.remove('valid');
     element.parentElement.lastElementChild.style.display = 'inline-block';
 }
-
 function hideHint(element){
     element.parentElement.classList.add('valid');
     element.parentElement.classList.remove('not-valid');
     element.parentElement.lastElementChild.style.display = 'none';
-}  
-
+}    
 //Individual validator function with accesibility feature to show or hide hints
-const nameValidator = () =>{
-    const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*?  ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(nameField.value);
+const nameValidator = () => {
+const nameIsValid = nameField.value.trim().length > 0
 
-    nameIsValid ? hideHint(nameField) : showHint(nameField);
+nameIsValid ? hideHint(nameField) : showHint(nameField);
 
-    return nameIsValid;
+return nameIsValid;
 }
 
 const emailValidator = () => {
-    const emailIsValid  = /^[^@]+@[^@]+\.[a-z]+$/i.test(email.value);
+const emailIsValid  = /^[^@]+@[^@]+\.[a-z]+$/i.test(email.value);
 
-    emailIsValid ? hideHint(email) : showHint(email);
+emailIsValid ? hideHint(email) : showHint(email);
 
-    return emailIsValid;
+return emailIsValid;
 }
-
 const activitiesValidator = () => {
-    let activityBox = document.getElementById('activities-box');
-    let activitiesIsValid = false;
-    if(totalCost > 0){
-        activitiesIsValid = true
-    } 
-    activitiesIsValid ? hideHint(activityBox) : showHint(activityBox);
-    return activitiesIsValid;
+let activityBox = document.getElementById('activities-box');
+let activitiesIsValid = false;
+if(totalCost > 0){
+    activitiesIsValid = true
+} 
+activitiesIsValid ? hideHint(activityBox) : showHint(activityBox);
+return activitiesIsValid;
 }
+// Validates the credit card information
 const creditCardValidator = () => {
-    const cardNumIsValid = /\d{13,16}/.test(cardNum.value);
-    const zipCodeIsValid = /\d{5}/.test(zipCode.value)
-    const cvvIsValid = /\d{3}/.test(cvv.value);
+const cardNumIsValid = /^\d{13,16}$/.test(cardNum.value);
+const zipCodeIsValid = /^\d{5}$/.test(zipCode.value)
+const cvvIsValid = /^\d{3}$/.test(cvv.value);
 
-    cardNumIsValid ? hideHint(cardNum) : showHint(cardNum);
-    zipCodeIsValid ? hideHint(zipCode) : showHint(zipCode);
-    cvvIsValid     ? hideHint(cvv)     : showHint(cvv);
+cardNumIsValid ? hideHint(cardNum) : showHint(cardNum);
+zipCodeIsValid ? hideHint(zipCode) : showHint(zipCode);
+cvvIsValid     ? hideHint(cvv)     : showHint(cvv);
+return cardNumIsValid && zipCodeIsValid && cvvIsValid;
+}
 
-    if( cardNumIsValid && zipCodeIsValid && cvvIsValid ){
-        return console.log(`credit card pass`);
-    } else {
-        return console.log(`credit card validation fail`);
-    }}
+form.addEventListener('submit', e => {
+    if(!nameValidator()){
+        e.preventDefault();     
+    }
+    if(!emailValidator()){
+        e.preventDefault();
+    }
 
-    form.addEventListener('submit', e => {
-        if(!nameValidator()) {  
+    if(!activitiesValidator()){
+        e.preventDefault();
+    }
+    if(payment.value === 'credit-card'){
+        if(!creditCardValidator()){
             e.preventDefault();
-            console.log(`Name validator prevented submission`);
-        }
-    
-        if(!emailValidator()) {
-            e.preventDefault();
-            console.log(`Email Validator prevented submission`);
-        }
-    
-         if(!activitiesValidator()) {
-             e.preventDefault();
-             console.log('Activities validator prevented submission');
-            }
-            if(payment.options[1].value){
-                if(!creditCardValidator()){
-                    e.preventDefault();
-                }
-            }
-        
-        });
+        }  
+    }
+});
+
