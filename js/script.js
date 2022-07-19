@@ -37,7 +37,7 @@ jobTitle.addEventListener('change', e => {
     }
 })
 
-jshirtDesign.addEventListener('change', e => {
+shirtDesign.addEventListener('change', e => {
     /**
      * Event reporting that the user made a selection on the
      * Design dropdown menu, thus can pick and option from the
@@ -61,7 +61,7 @@ jshirtDesign.addEventListener('change', e => {
 });
 console.log(checkboxes[1].getAttribute('data-day-and-time'));
 
-/Counter of all selected events
+//Counter of all selected events
 let totalCost= 0;
 activities.addEventListener('change', e => {
     let clicked = e.target
@@ -107,7 +107,7 @@ payment.addEventListener('change', e => {
         }
     } 
 });
-// Helper functions to Show or Hide Hints
+// Help functions to Show or Hide Hints
 function showHint(element){
    
     element.parentElement.classList.add('not-valid');
@@ -144,7 +144,7 @@ if(totalCost > 0){
 activitiesIsValid ? hideHint(activityBox) : showHint(activityBox);
 return activitiesIsValid;
 }
-// Validates the credit card information
+// Validate the ccCrd information
 const creditCardValidator = () => {
 const cardNumIsValid = /^\d{13,16}$/.test(cardNum.value);
 const zipCodeIsValid = /^\d{5}$/.test(zipCode.value)
